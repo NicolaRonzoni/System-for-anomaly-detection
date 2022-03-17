@@ -1,4 +1,5 @@
-# Pandas-InfluxDB
+# Anomaly detection 
+### Pandas-InfluxDB
 Workflow  for time series analysis. 
 
 Data Ingestion on Influxdb from Pandas :
@@ -11,4 +12,6 @@ Data Ingestion on Influxdb from Pandas :
 
 It is always possible to restore data in Pandas once manipulation are computed on InfluxDB using the same scheme showed above.  
 
+### Anomaly detection pipeline 
+Functions and main jupyter for Clustering task and detection models of failures in pump water system
 
