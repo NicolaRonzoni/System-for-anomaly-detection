@@ -49,6 +49,32 @@ import merlion.plot
 from merlion.plot import plot_anoms, Figure
 import matplotlib.pyplot as plt
 
+# data: pd dataframe containing 52 sensors, Unnamed: 0, timestamp and the machine status
+def imputation(data):
+    # set as index the timestamp and check for jump in the series 
+    # delete Unnamed: 0
+    data.index = pd.to_datetime(data['timestamp'])
+    data.drop(['timestamp','Unnamed: 0'], axis=1, inplace=True)
+    data = data.asfreq('1Min')
+    data.info()
+    #remove sensors: 00,15,50,51
+    data = data.drop(['sensor_15','sensor_50','sensor_51'], axis = 1)
+    # 1) For sensor_00, sensor_06, sensor_07, sensor_08, sensor_09 all missing values are replaced with 0. 
+    # Missing occur when the machine is in manteinance phase 
+    #  the trajectories during these times are flat near to 0 value.  
+    data['sensor_00']=data['sensor_00'].fillna(value=0)
+    data['sensor_06']=data['sensor_06'].fillna(value=0)
+    data['sensor_07']=data['sensor_07'].fillna(value=0)
+    data['sensor_08']=data['sensor_08'].fillna(value=0)
+    data['sensor_09']=data['sensor_09'].fillna(value=0)
+    #2) For all other sensors propagate the last valid observation forward up to a limit of 1 hour (60 entries), 
+    # for the remaining missing use the median over all the period. 
+    data=data.fillna(method='ffill', limit=60)
+    data1 = data.fillna(data.median())
+    print('Is there any missing values:',data1.isna().any().any())
+    return(data1)
+# output: pd dataframe with 50 columns, 49 sensors and the machine status. 
+
 #define a function to create the daily time series  without the scaling 
 def daily_series_pred(data,n):
     #normalization of the data 
