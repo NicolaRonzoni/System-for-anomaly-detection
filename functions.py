@@ -526,9 +526,12 @@ def RCFad2 (data,split,window_future,window_past,ground_truth):
         print('number of far out observations in the train set',far_out)
         num_samples_per_tree= int(1/(far_out/(len(train_data.to_pd()))))
         # number of observations in the train set >= than num_samples_per_tree*n_estimators
-        if num_samples_per_tree>int(len(train_data.to_pd())/num_trees):
-            num_samples_per_tree=256
-        print('number of sample per trees:',num_samples_per_tree)
+        if (num_samples_per_tree>int(len(train_data.to_pd())/num_trees) and num_samples_per_tree>int(len(train_data.to_pd())/64)) :
+            num_trees=int(len(train_data.to_pd())/num_samples_per_tree)
+        elif num_samples_per_tree>int(len(train_data.to_pd())/num_trees):
+            num_samples_per_tree=int(len(train_data.to_pd())/64)
+        print('number of sample per tree:',num_samples_per_tree)
+        print('number of per trees:',num_trees)
         test_data=TimeSeries.from_pd(data.iloc[split-1+window_future*i:split+window_future*i+window_future])
         model = RandomCutForest(RandomCutForestConfig(n_estimators=num_trees, max_n_samples=num_samples_per_tree, dimensions=1))
         model.train(train_data=train_data)
