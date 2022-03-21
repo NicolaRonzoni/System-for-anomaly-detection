@@ -530,13 +530,15 @@ def RCFad2 (data,split,window_future,window_past,ground_truth):
         #compute number of samples per tree as the inverse of proportion of outliers in the train set
         num_samples_per_tree= int(1/(far_out/(len(train_data.to_pd()))))
         # if the number of samples per tree is greater than number of observation divided by 128 and lower than number of observation divided by 64
-        if (num_samples_per_tree>int(len(train_data.to_pd())/num_trees) and num_samples_per_tree<int(len(train_data.to_pd())/64)) :
+        if int(len(train_data.to_pd())/num_trees)<= num_samples_per_tree <= int(len(train_data.to_pd())/64) :
             # decrease the number of estimators such that number of observations is equal to num_samples_per_tree*n_estimators
             num_trees=int(len(train_data.to_pd())/num_samples_per_tree)
         # if the number of samples per tree is greater than number of observation divided by 64 
-        elif num_samples_per_tree>=int(len(train_data.to_pd())/num_trees):
+        elif num_samples_per_tree>int(len(train_data.to_pd())/64):
             # set the number of samples per tree as 512
             num_samples_per_tree=512
+            # set the number of trees to 64
+            num_trees=64
         print('number of sample per tree:',num_samples_per_tree)
         print('number of per trees:',num_trees)
         test_data=TimeSeries.from_pd(data.iloc[split-1+window_future*i:split+window_future*i+window_future])
