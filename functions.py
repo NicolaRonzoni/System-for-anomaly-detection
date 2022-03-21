@@ -504,11 +504,11 @@ def prophetAD (data,split,window_future,window_past,ground_truth):
 # window_future how many steps forward we would like to predict each time. 
 # ground truth: univariate pd.series() containing labels 0/1
 def RCFad2 (data,split,window_future,window_past,ground_truth):
-    # set the number of trees in the forest 
-    num_trees=128
     # initialize the dataframe where store z-scores from the sensor
     result=pd.DataFrame(data=None)
-    for i in range (4): 
+    for i in range (4):
+        # initialize the number of trees in the forest 
+        num_trees=128 
         # train test split (test set as always the same size, while train )
         train_data = TimeSeries.from_pd(data.iloc[split+window_future*i-window_past:split-1+window_future*i])
         # compute median
