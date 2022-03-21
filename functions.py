@@ -523,7 +523,7 @@ def RCFad2 (data,split,window_future,window_past,ground_truth):
         # count observations greater than upper bound 
         upper_count=(train_data.to_pd()>upper).sum()
         far_out=lower_count+upper_count+1
-        if far_out.tem() < int(10):
+        if far_out.item() < int(10):
             # set by default 0.05% of observations as outliers 
             far_out=int(0.005*(len(train_data.to_pd())))
         print('number of far out observations in the train set',far_out)
