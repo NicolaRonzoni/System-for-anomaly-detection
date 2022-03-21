@@ -522,14 +522,21 @@ def RCFad2 (data,split,window_future,window_past,ground_truth):
         lower_count=(train_data.to_pd()<lower).sum()
         # count observations greater than upper bound 
         upper_count=(train_data.to_pd()>upper).sum()
-        far_out=lower_count+upper_count+1
+        far_out=lower_count+upper_count
+        if far_out<10:
+            # set by default 0.05% of observations as outliers 
+            far_out=int(0.005*(len(train_data.to_pd())))
         print('number of far out observations in the train set',far_out)
+        #compute number of samples per tree as the inverse of proportion of outliers in the train set
         num_samples_per_tree= int(1/(far_out/(len(train_data.to_pd()))))
-        # number of observations in the train set >= than num_samples_per_tree*n_estimators
-        if (num_samples_per_tree>int(len(train_data.to_pd())/num_trees) and num_samples_per_tree>int(len(train_data.to_pd())/64)) :
+        # if the number of samples per tree is greater than number of observation divided by 128 and lower than number of observation divided by 64
+        if (num_samples_per_tree>int(len(train_data.to_pd())/num_trees) and num_samples_per_tree<int(len(train_data.to_pd())/64)) :
+            # decrease the number of estimators such that number of observations is equal to num_samples_per_tree*n_estimators
             num_trees=int(len(train_data.to_pd())/num_samples_per_tree)
-        elif num_samples_per_tree>int(len(train_data.to_pd())/num_trees):
-            num_samples_per_tree=int(len(train_data.to_pd())/64)
+        # if the number of samples per tree is greater than number of observation divided by 64 
+        elif num_samples_per_tree>=int(len(train_data.to_pd())/num_trees):
+            # set the number of samples per tree as 512
+            num_samples_per_tree=512
         print('number of sample per tree:',num_samples_per_tree)
         print('number of per trees:',num_trees)
         test_data=TimeSeries.from_pd(data.iloc[split-1+window_future*i:split+window_future*i+window_future])
