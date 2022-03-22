@@ -794,7 +794,7 @@ def dynamicbaseline_visual (data,split,window_future,window_past,ground_truth):
         train_data = TimeSeries.from_pd(data.iloc[0:split])
         train_labels = TimeSeries.from_pd(ground_truth.iloc[0:split])
         test_data=TimeSeries.from_pd(data.iloc[split:split+window_future])
-        test_labels=TimeSeries.from_pd(anomaly.iloc[split:split+window_future])
+        test_labels=TimeSeries.from_pd(ground_truth.iloc[split:split+window_future])
         # model configuration the model considers only most recent data (4 weeks in the past)
         config=DynamicBaselineConfig(trend='daily',train_window='4w',window_sz='1min')
         model = DynamicBaseline(config)
