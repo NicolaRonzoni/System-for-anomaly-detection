@@ -6,6 +6,7 @@
 }
 
 # import the libraries 
+from unittest import result
 import pandas as pd
 import csv
 import os
@@ -552,94 +553,200 @@ def RCFad2 (data,split,window_future,window_past,ground_truth):
 # Point Adjusted evaluation
 # input:  pandas dataframe containing the result for the scenario of interest and labels as last columns df.iloc[0:10080,]
 def evaluation_PA(model1,model2,model3): 
+    # create a dataframe where store the results
+    # store result in a dataframe 
+    result=pd.DataFrame(data=None, columns=['Precision_DB','Recall_DB','F1_DB','MTTD_DB','Precision_PH','Recall_PH','F1_PH','MTTD_PH','Precision_RCF','Recall_RCF','F1_RCF','MTTD_RCF'],index=model1.columns)
+    result=result[:-1]
+    # give name to the model
     model1.name='DynamicBaseline'
     model2.name='Prophet'
     model3.name='RandomCutForest'
+    # initialize list 
+    Precision_DB=[]
+    Recall_DB=[]
+    F1_DB=[]
+    MTTD_DB=[]
+    Precision_PH=[]
+    Recall_PH=[]
+    F1_PH=[]
+    MTTD_PH=[]
+    Precision_RCF=[]
+    Recall_RCF=[]
+    F1_RCF=[]
+    MTTD_RCF=[]
     # define ground truth labels from one of the model (all models have the same ground truth labels)
     test_labels = TimeSeries.from_pd(model1.labels)
     # for every sensor in the models
-    for i in range(19):
+    for i in range(49):
         print()
+        #dynamicbaseline
         print(model1.iloc[:,i].name)
         print(model1.name)
         precision_model1 = TSADMetric.PointAdjustedPrecision.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]))
-        #recall_mode1 = TSADMetric.PointAdjustedRecall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]))
-        #f1_model1 = TSADMetric.PointAdjustedF1.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]))
+        recall_model1 = TSADMetric.PointAdjustedRecall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]))
+        f1_model1 = TSADMetric.PointAdjustedF1.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]))
         mttd_model1 = TSADMetric.MeanTimeToDetect.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]))
         print(f"  Precision: {precision_model1:.4f}")
-        #print(f" Recall:    {recall_mode1:.4f}")
-        #print(f"  F1:        {f1_model1:.4f}")
+        print(f" Recall:    {recall_model1:.4f}")
+        print(f"  F1:        {f1_model1:.4f}")
         print(f"  MTTD:      {mttd_model1}")
+        # append the results to the lists 
+        Precision_DB.append(precision_model1)
+        Recall_DB.append(recall_model1)
+        F1_DB.append(f1_model1)
+        MTTD_DB.append(mttd_model1)
+        # prophet
         print(model2.name)
         precision_model2 = TSADMetric.PointAdjustedPrecision.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]))
-        #recall_mode2 = TSADMetric.PointAdjustedRecall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]))
-        #f1_model2 = TSADMetric.PointAdjustedF1.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]))
+        recall_model2 = TSADMetric.PointAdjustedRecall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]))
+        f1_model2 = TSADMetric.PointAdjustedF1.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]))
         mttd_model2 = TSADMetric.MeanTimeToDetect.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]))
         print(f"  Precision: {precision_model2:.4f}")
-        #print(f"  Recall:    {recall_mode2:.4f}")
-        #print(f"  F1:        {f1_model2:.4f}")
+        print(f"  Recall:    {recall_model2:.4f}")
+        print(f"  F1:        {f1_model2:.4f}")
         print(f"  MTTD:      {mttd_model2}")
+        # append the results to the lists 
+        Precision_PH.append(precision_model2)
+        Recall_PH.append(recall_model2)
+        F1_PH.append(f1_model2)
+        MTTD_PH.append(mttd_model2)
+        # random cut forest
         print(model3.name)
         precision_model3 = TSADMetric.PointAdjustedPrecision.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]))
-        #recall_mode3 = TSADMetric.PointAdjustedRecall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model3.iloc[:,i]))
-        #f1_model3 = TSADMetric.PointAdjustedF1.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]))
+        recall_model3 = TSADMetric.PointAdjustedRecall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model3.iloc[:,i]))
+        f1_model3 = TSADMetric.PointAdjustedF1.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]))
         mttd_model3 = TSADMetric.MeanTimeToDetect.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]))
         print(f"  Precision: {precision_model3:.4f}")
-        #print(f"  Recall:    {recall_mode3:.4f}")
-        #print(f"  F1:        {f1_model3:.4f}")
+        print(f"  Recall:    {recall_model3:.4f}")
+        print(f"  F1:        {f1_model3:.4f}")
         print(f"  MTTD:      {mttd_model3}")
         print()
-    return ()
+        # append the results to the lists
+        Precision_RCF.append(precision_model3)
+        Recall_RCF.append(recall_model3)
+        F1_RCF.append(f1_model3)
+        MTTD_RCF.append(mttd_model3)
+    #assign th lists to the  dataframe 
+    result['Precision_DB']=Precision_DB
+    result['Recall_DB']=Recall_DB
+    result['F1_DB']=F1_DB
+    result['MTTD_DB']=MTTD_DB
+    result['Precision_PH']=Precision_PH
+    result['Recall_PH']=Recall_PH
+    result['F1_PH']=F1_PH
+    result['MTTD_PH']=MTTD_PH
+    result['Precision_RCF']=Precision_RCF
+    result['Recall_RCF']=Recall_RCF
+    result['F1_RCF']=F1_RCF
+    result['MTTD_RCF']=MTTD_RCF
+    return (result)
 # Revised point adjusted evaluation
 # input: pandas dataframe containing the result for the scenario of interest and labels as last columns df.iloc[10080:20160,]
 # df.iloc[30240:40320,]
 def evaluation_RPA(model1,model2,model3): 
+    # create a dataframe where store the results
+    # store result in a dataframe 
+    result=pd.DataFrame(data=None, columns=['Precision_DB','Recall_DB','F1_DB','MTTD_DB','Precision_PH','Recall_PH','F1_PH','MTTD_PH','Precision_RCF','Recall_RCF','F1_RCF','MTTD_RCF'],index=model1.columns)
+    result=result[:-1]
+    # assign names to the models 
     model1.name='DynamicBaseline'
     model2.name='Prophet'
     model3.name='RandomCutForest'
+    # initialize lists 
+    Precision_DB=[]
+    Recall_DB=[]
+    F1_DB=[]
+    MTTD_DB=[]
+    Precision_PH=[]
+    Recall_PH=[]
+    F1_PH=[]
+    MTTD_PH=[]
+    Precision_RCF=[]
+    Recall_RCF=[]
+    F1_RCF=[]
+    MTTD_RCF=[]
     # define ground truth labels from one of the model (all models have the same ground truth labels)
     test_labels = TimeSeries.from_pd(model1.labels)
     # for every sensor in the models
-    for i in range(19):
+    for i in range(49):
         print()
         print(model1.iloc[:,i].name)
+        #dynamicbaseline
         print(model1.name)
         precision_model1 = TSADMetric.Precision.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]), max_early_sec=600)
-        recall_mode1 = TSADMetric.Recall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]), max_early_sec=600)
+        recall_model1 = TSADMetric.Recall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]), max_early_sec=600)
         f1_model1 = TSADMetric.F1.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]), max_early_sec=600)
         mttd_model1 = TSADMetric.MeanTimeToDetect.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model1.iloc[:,i]))
         print(f"  Precision: {precision_model1:.4f}")
-        print(f"  Recall:    {recall_mode1:.4f}")
-        #print(f"  F1:        {f1_model1:.4f}")
+        print(f"  Recall:    {recall_model1:.4f}")
+        print(f"  F1:        {f1_model1:.4f}")
         print(f"  MTTD:      {mttd_model1}")
+        # append the results to the lists 
+        Precision_DB.append(precision_model1)
+        Recall_DB.append(recall_model1)
+        F1_DB.append(f1_model1)
+        MTTD_DB.append(mttd_model1)
+        #prophet
         print(model2.name)
         precision_model2 = TSADMetric.Precision.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]), max_early_sec=600)
-        recall_mode2 = TSADMetric.Recall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]), max_early_sec=600)
+        recall_model2 = TSADMetric.Recall.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]), max_early_sec=600)
         f1_model2 = TSADMetric.F1.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model2.iloc[:,i]), max_early_sec=600)
         mttd_model2 = TSADMetric.MeanTimeToDetect.value(ground_truth=test_labels, predict= TimeSeries.from_pd(model2.iloc[:,i]))
         print(f"  Precision: {precision_model2:.4f}")
-        print(f"  Recall:    {recall_mode2:.4f}")
-        #print(f"  F1:        {f1_model2:.4f}")
+        print(f"  Recall:    {recall_model2:.4f}")
+        print(f"  F1:        {f1_model2:.4f}")
         print(f"  MTTD:      {mttd_model2}")
+        # append the results to the lists 
+        Precision_PH.append(precision_model2)
+        Recall_PH.append(recall_model2)
+        F1_PH.append(f1_model2)
+        MTTD_PH.append(mttd_model2)
         print()
+        #Random Cut Forest
         print(model3.name)
         precision_model3 = TSADMetric.Precision.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]), max_early_sec=600)
-        recall_mode3 = TSADMetric.Recall.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]), max_early_sec=600)
+        recall_model3 = TSADMetric.Recall.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]), max_early_sec=600)
         f1_model3 = TSADMetric.F1.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]), max_early_sec=600)
         mttd_model3 = TSADMetric.MeanTimeToDetect.value(ground_truth=test_labels, predict=TimeSeries.from_pd(model3.iloc[:,i]))
         print(f"  Precision: {precision_model3:.4f}")
-        print(f"  Recall:    {recall_mode3:.4f}")
-        #print(f"  F1:        {f1_model3:.4f}")
+        print(f"  Recall:    {recall_model3:.4f}")
+        print(f"  F1:        {f1_model3:.4f}")
         print(f"  MTTD:      {mttd_model3}")
         print()
-    return ()
+        # append the results to the lists
+        Precision_RCF.append(precision_model3)
+        Recall_RCF.append(recall_model3)
+        F1_RCF.append(f1_model3)
+        MTTD_RCF.append(mttd_model3)
+    #assign th lists to the  dataframe 
+    result['Precision_DB']=Precision_DB
+    result['Recall_DB']=Recall_DB
+    result['F1_DB']=F1_DB
+    result['MTTD_DB']=MTTD_DB
+    result['Precision_PH']=Precision_PH
+    result['Recall_PH']=Recall_PH
+    result['F1_PH']=F1_PH
+    result['MTTD_PH']=MTTD_PH
+    result['Precision_RCF']=Precision_RCF
+    result['Recall_RCF']=Recall_RCF
+    result['F1_RCF']=F1_RCF
+    result['MTTD_RCF']=MTTD_RCF
+    return (result)
 # count the number of z-scores different from 0 df.iloc[20160:30240,]
 def count_anomalies(model1,model2,model3): 
+    # define a dataframe where store the  result
+    result=pd.DataFrame(data=None, columns=['% false anomalies DB','% false anomalies PH','% false anomalies RCF'],index=model1.columns)
+    result=result[:-1]
+    # assign name to the models  
     model1.name='DynamicBaseline'
     model2.name='Prophet'
     model3.name='RandomCutForest'
+    # initialize the lists 
+    FA_DB=[]
+    FA_PH=[]
+    FA_RCF=[]
     # for every sensor in the models
-    for i in range(19):
+    for i in range(49):
         print()
         # print the name of the sensor
         print(model1.iloc[:,i].name)
@@ -648,20 +755,17 @@ def count_anomalies(model1,model2,model3):
         anomalies_model2 = (model2.iloc[:,i]!=0).sum()
         anomalies_model3 = (model3.iloc[:,i]!=0).sum()
         #print name of the model and number of false anomalies 
-        if (anomalies_model1==0):
-            print(model1.name,': ', anomalies_model1,'predicted false anomaly')
-        else :
-             print(model1.name,': ', anomalies_model1/len(model1.iloc[:,i])*100,'%  of false anomalies')
-        if (anomalies_model2==0):    
-            print(model2.name,': ', anomalies_model2,'predicted false anomaly')
-        else:
-            print(model2.name,': ', anomalies_model2/len(model2.iloc[:,i])*100,'%  of false anomalies')
-        if (anomalies_model3==0):
-            print(model3.name,': ', anomalies_model3,'predicted false anomaly')
-        else:
-            print(model3.name,': ', anomalies_model3/len(model3.iloc[:,i])*100,'%  of false anomalies')
+        print(model1.name,': ', anomalies_model1/len(model1.iloc[:,i])*100,'% of  false anomalies')
+        FA_DB.append( anomalies_model1/len(model1.iloc[:,i])*100)
+        print(model2.name,': ', anomalies_model2/len(model2.iloc[:,i])*100,'% of false anomalies')
+        FA_PH.append(anomalies_model2/len(model2.iloc[:,i])*100)
+        print(model3.name,': ', anomalies_model3/len(model3.iloc[:,i])*100,'% of false anomalies')
+        FA_RCF.append(anomalies_model3/len(model3.iloc[:,i])*100)
         print()
-    return ()
+    result['% of false anomalies DB']=FA_DB
+    result['% of false anomalies PH']=FA_PH
+    result['% of false anomalies RCF']=FA_RCF
+    return (result)
 # functions for visualizations
 # prophet
 def prophetAD_visual (data,split,window_future,window_past,ground_truth):
@@ -723,12 +827,22 @@ def RCFad2_visual(data,split,window_future,window_past,ground_truth):
     # count observations greater than upper bound 
     upper_count=(train_data.to_pd()>upper).sum()
     far_out=lower_count+upper_count+1
-    print('number of far out observations in the train set',far_out)
+    if far_out.item() < int(10):
+        # set by default 0.05% of observations as outliers 
+        far_out=int(0.005*(len(train_data.to_pd())))
+        print('number of far out observations in the train set',far_out)
+    #compute number of samples per tree as the inverse of proportion of outliers in the train set
     num_samples_per_tree= int(1/(far_out/(len(train_data.to_pd()))))
-    # number of observations in the train set >= than num_samples_per_tree*n_estimators
-    if num_samples_per_tree>int(len(train_data.to_pd())/num_trees):
-        num_samples_per_tree=256
-    print('number of sample per trees:',num_samples_per_tree)
+    # if the number of samples per tree is greater than number of observation divided by 128 and lower than number of observation divided by 64
+    if int(len(train_data.to_pd())/num_trees)<= num_samples_per_tree <= int(len(train_data.to_pd())/64) :
+            # decrease the number of estimators such that number of observations is equal to num_samples_per_tree*n_estimators
+            num_trees=int(len(train_data.to_pd())/num_samples_per_tree)
+    # if the number of samples per tree is greater than number of observation divided by 64 
+    elif num_samples_per_tree>int(len(train_data.to_pd())/64):
+        # set the number of samples per tree as 512
+        num_samples_per_tree=512
+        # set the number of trees to 64
+        num_trees=64
     test_data=TimeSeries.from_pd(data.iloc[split-1:split+window_future])
     test_labels=TimeSeries.from_pd(ground_truth.iloc[split-1:split+window_future])
     model = RandomCutForest(RandomCutForestConfig(n_estimators=num_trees, max_n_samples=num_samples_per_tree, dimensions=1))
