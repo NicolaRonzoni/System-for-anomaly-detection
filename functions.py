@@ -735,7 +735,7 @@ def evaluation_RPA(model1,model2,model3):
 # count the number of z-scores different from 0 df.iloc[20160:30240,]
 def count_anomalies(model1,model2,model3): 
     # define a dataframe where store the  result
-    result=pd.DataFrame(data=None, columns=['% false anomalies DB','% false anomalies PH','% false anomalies RCF'],index=model1.columns)
+    result=pd.DataFrame(data=None, columns=['% of false anomalies DB','% of false anomalies PH','% of false anomalies RCF'],index=model1.columns)
     result=result[:-1]
     # assign name to the models  
     model1.name='DynamicBaseline'
