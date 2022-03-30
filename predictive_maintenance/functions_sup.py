@@ -104,7 +104,7 @@ def grid_gbm (regressors,labels,type_avg):
         'subsample': (0.8, 1)
     }
     gbm_bo = BayesianOptimization(gbm_cl_bo, params_gbm, random_state=111)
-    gbm_bo.maximize(init_points=30, n_iter=6)
+    gbm_bo.maximize(init_points=20, n_iter=5)
     params_gbm = gbm_bo.max['params']
     params_gbm['max_depth'] = int(params_gbm['max_depth'])
     params_gbm['n_estimators'] = int(params_gbm['n_estimators'])
@@ -173,7 +173,7 @@ def grid_abm(regressors,labels,avg_type):
         'n_estimators':(80, 150),
     }
     abm_bo = BayesianOptimization(abm_cl_bo, params_abm, random_state=111)
-    abm_bo.maximize(init_points=30, n_iter=6)
+    abm_bo.maximize(init_points=20, n_iter=5)
     params_abm = abm_bo.max['params']
     params_abm['n_estimators'] = int(params_abm['n_estimators'])
     print(params_abm)
@@ -203,7 +203,7 @@ def grid_rfm(regressors,labels,avg_type):
     }
     # bayes optimization
     rfm_bo = BayesianOptimization(rfm_cl_bo, params_rfm, random_state=111)
-    rfm_bo.maximize(init_points=30, n_iter=6)
+    rfm_bo.maximize(init_points=20, n_iter=5)
     # return the best hyperparameter
     params_rfm = {}
     params_rfm['max_depth'] = int(rfm_bo.max["params"]["max_depth"])
@@ -266,7 +266,7 @@ def grid_nn(regressors,labels,avg_type):
     }
     # bayes optimization
     nn_bo = BayesianOptimization(nn_cl_bo, params_nn, random_state=111)
-    nn_bo.maximize(init_points=30, n_iter=6)
+    nn_bo.maximize(init_points=20, n_iter=5)
     params_nn={}
     params_nn["activation"]= activation[int(nn_bo.max["params"]["activation_function"])]
     params_nn["momentum"] = nn_bo.max["params"]["momentum"]
@@ -314,7 +314,7 @@ def pre_process_EF(data):
     data=data[["Ia","Ib","Ic","Va","Vb","Vc","Target","Failure Type"]]
     return (data) 
 def grid_nn_ef(regressors,labels,avg_type):
-    solver=['sgd', 'adam']
+    solver=['lbfgs','sgd', 'adam']
     activation=['identity', 'logistic', 'tanh', 'relu']
     learning_rate=['constant', 'invscaling', 'adaptive']
     early_stopping=[True,False]
@@ -331,7 +331,7 @@ def grid_nn_ef(regressors,labels,avg_type):
         params_nn['early_stopping']=early_stopping[int(early_stop)]
         params_nn['max_iter']=int(max_iter)
         params_nn['alpha']=alpha
-        if int(layers)==3:
+        if int(layers)==2:
             params_nn['hidden_layer_sizes']=(int(neurons1),int(neurons2),)
         else :
             params_nn['hidden_layer_sizes']=(int(neurons1),)
@@ -348,20 +348,20 @@ def grid_nn_ef(regressors,labels,avg_type):
     params_nn ={
         'validation_fraction':(0,0.99),
         'momentum':(0,1),
-        'batch_size':(16,256),
+        'batch_size':(16,128),
         'early_stop':(0,1.99), # int 0,1
         'initial_learning_rate':(0,2.99) ,# int 0,1,2,
         'activation_function':(0,3.99), # int 0,1,2,3
-        'optimizer':(0,1.99), # int 0,1
+        'optimizer':(0,2.99), # int 0,1
         'neurons1':(int(regressors.shape[1]),int(5/2*regressors.shape[1])),
         'neurons2':(int(2/3*regressors.shape[1]),int(3/2*regressors.shape[1])),
         'layers':(1,2.99), #int 1,2
-        'max_iter':(10000,12000),
+        'max_iter':(80000,90000),
         'alpha':(0.00001,0.01)
     }
     # bayes optimization
     nn_bo = BayesianOptimization(nn_cl_bo, params_nn, random_state=111)
-    nn_bo.maximize(init_points=30, n_iter=6)
+    nn_bo.maximize(init_points=20, n_iter=5)
     params_nn={}
     params_nn["activation"]= activation[int(nn_bo.max["params"]["activation_function"])]
     params_nn["momentum"] = nn_bo.max["params"]["momentum"]
@@ -372,7 +372,7 @@ def grid_nn_ef(regressors,labels,avg_type):
     params_nn["early_stopping"]= early_stopping[int(nn_bo.max["params"]["early_stop"])]
     params_nn["max_iter"]= int(nn_bo.max["params"]["max_iter"])
     params_nn["alpha"]= nn_bo.max["params"]["alpha"]
-    if int(nn_bo.max["params"]["layers"])==3:
+    if int(nn_bo.max["params"]["layers"])==2:
         params_nn["hidden_layer_sizes"]=(int(nn_bo.max["params"]["neurons1"]),int(nn_bo.max["params"]["neurons2"]),)
     else:
         params_nn["hidden_layer_sizes"]=(int(nn_bo.max["params"]["neurons1"]),)
