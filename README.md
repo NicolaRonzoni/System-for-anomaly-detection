@@ -28,8 +28,8 @@ Functions and jupyters of supervised techniques on detection and failure type cl
 Workflow for Machine predictive maintenance and electrical fault classification:
 1. Data strategy 
 2. Bayesian optimization on a specific target 
-3. Ensamble learning boosting and bagging. 
-4. Neural Network (MLP)
+3. Ensamble learning boosting (Gradient Boost classifier, Adaptive boost classifier) and bagging (Random Forest). 
+4. Neural Network (MLP classifier)
 5. Evaluation on confusion matrices, balanced accuracy, micro/macro metrics. 
 
 
