@@ -294,11 +294,11 @@ def pre_process_EF(data):
 # define a function for failure type classification in a unique variable    
     def conditions_FT(s):
         if (s['G']== 1) and (s['C'] == 0) and (s['B'] == 0) and (s['A']==1):
-            return "Fault between Phase A and ground"
-        elif (s['G']== 0) and (s['C'] == 0) and (s['B'] == 1) and (s['A']==1):
-            return "Fault between Phase A and Phase B"
+            return "Fault between phase A and ground"
+        elif (s['G']== 0) and (s['C'] == 1) and (s['B'] == 1) and (s['A']==0):
+            return "Fault between phase B and phase C"
         elif (s['G']== 1) and (s['C'] == 0) and (s['B'] == 1) and (s['A']==1):
-            return "Fault between Phase A,B and ground"
+            return "Fault between phases A,B and ground"
         elif (s['G']== 0) and (s['C'] == 1) and (s['B'] == 1) and (s['A']==1):
             return "Fault between all three phases"
         elif (s['G']== 1) and (s['C'] == 1) and (s['B'] == 1) and (s['A']==1):
@@ -355,7 +355,7 @@ def grid_nn_ef(regressors,labels,avg_type):
         'early_stop':(0,1.99), # int 0,1
         'initial_learning_rate':(0,2.99) ,# int 0,1,2,
         'activation_function':(0,3.99), # int 0,1,2,3
-        'optimizer':(0,2.99), # int 0,1
+        'optimizer':(0,2.99), # int 0,1,2
         'neurons1':(int(regressors.shape[1]),int(5/2*regressors.shape[1])),
         'neurons2':(int(2/3*regressors.shape[1]),int(3/2*regressors.shape[1])),
         'layers':(1,2.99), #int 1,2
