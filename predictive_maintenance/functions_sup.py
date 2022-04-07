@@ -145,7 +145,7 @@ def confusion_failure_type(ground_truth,predicted,labels=['Heat Dissipation Fail
     cm = confusion_matrix(ground_truth[:,1],predicted[:,1])
     disp    = ConfusionMatrixDisplay(confusion_matrix = cm, display_labels=labels)
     plt.rcParams.update({'font.size': 14})
-    fig, ax = plt.subplots(figsize = (28,22))
+    fig, ax = plt.subplots(figsize = (32,24))
     disp.plot(cmap = plt.cm.Greys, ax   = ax)
     plt.xticks(rotation=30, ha='right')
     plt.yticks(rotation=30,ha='right')
@@ -315,14 +315,15 @@ def pre_process_EF(data):
     data['Target'] = data.apply(conditions_MS, axis=1)    
     data= data.drop(["G","C", "B","A"],axis = 1)
     data=data[["Ia","Ib","Ic","Va","Vb","Vc","Target","Failure Type"]]
-    return (data) 
+    return (data)
+    # bayesian grid search for eletrical fault 
 def grid_nn_ef(regressors,labels,avg_type):
     solver=['lbfgs','sgd', 'adam']
     activation=['identity', 'logistic', 'tanh', 'relu']
     learning_rate=['constant', 'invscaling', 'adaptive']
     early_stopping=[True,False]
     # maximize the target
-    def nn_cl_bo(neurons1, neurons2, layers, activation_function, optimizer, initial_learning_rate, batch_size,
+    def nn_cl_bo(neurons1, activation_function, optimizer, initial_learning_rate, batch_size,
                momentum, validation_fraction, early_stop,alpha,max_iter):
         params_nn={}
         params_nn['batch_size'] = int(batch_size)
@@ -334,10 +335,7 @@ def grid_nn_ef(regressors,labels,avg_type):
         params_nn['early_stopping']=early_stopping[int(early_stop)]
         params_nn['max_iter']=int(max_iter)
         params_nn['alpha']=alpha
-        if int(layers)==2:
-            params_nn['hidden_layer_sizes']=(int(neurons1),int(neurons2),)
-        else :
-            params_nn['hidden_layer_sizes']=(int(neurons1),)
+        params_nn['hidden_layer_sizes']=(int(neurons1),)
         classifier = MLPClassifier(random_state=123, **params_nn)
         multi_target_classifier = MultiOutputClassifier(classifier, n_jobs=-1)
         multi_target_classifier.fit(regressors,labels)
@@ -355,11 +353,9 @@ def grid_nn_ef(regressors,labels,avg_type):
         'early_stop':(0,1.99), # int 0,1
         'initial_learning_rate':(0,2.99) ,# int 0,1,2,
         'activation_function':(0,3.99), # int 0,1,2,3
-        'optimizer':(0,2.99), # int 0,1,2
-        'neurons1':(int(regressors.shape[1]),int(5/2*regressors.shape[1])),
-        'neurons2':(int(2/3*regressors.shape[1]),int(3/2*regressors.shape[1])),
-        'layers':(1,2.99), #int 1,2
-        'max_iter':(80000,90000),
+        'optimizer':(0,2.99), # int 0,1
+        'neurons1':(int(1.5*regressors.shape[1]),int(5/2*regressors.shape[1])),
+        'max_iter':(800000,810000),
         'alpha':(0.00001,0.01)
     }
     # bayes optimization
@@ -375,10 +371,7 @@ def grid_nn_ef(regressors,labels,avg_type):
     params_nn["early_stopping"]= early_stopping[int(nn_bo.max["params"]["early_stop"])]
     params_nn["max_iter"]= int(nn_bo.max["params"]["max_iter"])
     params_nn["alpha"]= nn_bo.max["params"]["alpha"]
-    if int(nn_bo.max["params"]["layers"])==2:
-        params_nn["hidden_layer_sizes"]=(int(nn_bo.max["params"]["neurons1"]),int(nn_bo.max["params"]["neurons2"]),)
-    else:
-        params_nn["hidden_layer_sizes"]=(int(nn_bo.max["params"]["neurons1"]),)
+    params_nn["hidden_layer_sizes"]=(int(nn_bo.max["params"]["neurons1"]),)
     print(params_nn)
     return (params_nn)   
     
